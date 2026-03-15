@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NeuralFill</title>
+  <link rel="stylesheet" href="popup.css">
+  <link rel="stylesheet" href="profiles.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>NeuralFill</h1>
+      <p class="subtitle">Local-First Intelligent Filler</p>
+    </header>
+
+    <!-- Lock View -->
+    <main id="lockView" class="hidden">
+      <div class="lock-screen">
+        <div class="lock-icon">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="5" y="13" width="18" height="13" rx="3" fill="rgba(255,255,255,0.12)" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/>
+            <path d="M9 13V9.5C9 7 10.8 5 14 5C17.2 5 19 7 19 9.5V13" stroke="rgba(255,255,255,0.5)" stroke-width="1.5" stroke-linecap="round"/>
+            <circle cx="14" cy="20" r="2" fill="rgba(255,255,255,0.5)"/>
+          </svg>
+        </div>
+        <p class="lock-title">NeuralFill is Locked</p>
+        <p class="lock-subtitle">Enter your PIN to continue</p>
+
+        <div class="pin-dot-row" id="lockPinDots">
+          <span class="pin-dot"></span>
+          <span class="pin-dot"></span>
+          <span class="pin-dot"></span>
+          <span class="pin-dot"></span>
+          <span class="pin-dot"></span>
+          <span class="pin-dot"></span>
+        </div>
+        <input type="tel" id="lockPinInput" maxlength="6" autocomplete="off"
+               inputmode="numeric" class="pin-hidden-input" placeholder="">
+
+        <p id="lockPinError" class="pin-error hidden">Incorrect PIN — try again</p>
+        <button id="unlockBtn" class="primary-btn" disabled>Unlock</button>
+      </div>
+    </main>
+
+    <!-- PIN Setup View -->
+    <main id="pinSetupView" class="hidden">
+      <div class="lock-screen">
+        <div class="lock-icon">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="5" y="13" width="18" height="13" rx="3" fill="rgba(255,255,255,0.12)" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/>
+            <path d="M9 13V9.5C9 7 10.8 5 14 5C17.2 5 19 7 19 9.5V13" stroke="rgba(255,255,255,0.5)" stroke-width="1.5" stroke-linecap="round"/>
+            <circle cx="14" cy="20" r="2" fill="rgba(255,255,255,0.5)"/>
+          </svg>
+        </div>
+        <p class="lock-title" id="pinSetupTitle">Set a PIN</p>
+        <p class="lock-subtitle" id="pinSetupSubtitle">Protects your profiles and data. Required before every form fill.</p>
+
+        <div class="pin-dot-row" id="setupPinDots">
+          <span class="pin-dot"></span>
+          <span class="pin-dot"></span>
+          <span class="pin-dot"></span>
+          <span class="pin-dot"></span>
+          <span class="pin-dot"></span>
+          <span class="pin-dot"></span>
+        </div>
+        <input type="tel" id="setupPinInput" maxlength="6" autocomplete="off"
+               inputmode="numeric" class="pin-hidden-input" placeholder="">
+
+        <p id="pinSetupError" class="pin-error hidden">PINs don't match — try again</p>
+        <button id="pinSetupNextBtn" class="primary-btn" disabled>Continue</button>
+      </div>
+    </main>
+
+    <!-- Main View -->
+    <main id="mainView" class="hidden">
+      <div class="form-group">
+        <label for="profileSelect">Active Profile</label>
+        <div style="display: flex; gap: 8px;">
+           <select id="profileSelect">
+             <option value="default">Default</option>
+           </select>
+           <button id="editProfilesBtn" class="secondary-btn" style="width: auto; margin: 0; padding: 10px 14px; font-size: 13px;">Edit</button>
+        </div>
+      </div>
+
+      <div class="form-group toggle-group" id="aiToggleGroup">
+        <label for="aiToggle">Gemini Nano AI</label>
+        <label class="switch">
+          <input type="checkbox" id="aiToggle" checked>
+          <span class="slider round"></span>
+        </label>
+      </div>
+
+      <div class="form-group toggle-group">
+        <div>
+          <label for="badgeToggle" style="margin-bottom:0;">Floating Badge</label>
+          <div style="font-size:11px;color:var(--text-tertiary);margin-top:2px;">Show fill &amp; capture prompts on pages</div>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="badgeToggle" checked>
+          <span class="slider round"></span>
+        </label>
+      </div>
+
+      <div class="form-group">
+        <label for="answerLengthSelect" style="margin-bottom:6px;">Generate Answer Length</label>
+        <select id="answerLengthSelect" style="width:100%;">
+          <option value="short">Short — 1–2 sentences</option>
+          <option value="medium" selected>Medium — 3–4 sentences</option>
+          <option value="long">Long — full paragraph</option>
+        </select>
+      </div>
+      
+      <div id="aiSetupPrompt" class="hidden">
+         <strong>⚠ AI Engine Not Detected</strong> 
+         <span>Gemini Nano requires a one-time setup to run locally.</span>
+         <div style="margin-top: 8px;"><a href="#" id="showAiSetupBtn" class="primary-btn" style="display: inline-block; width: auto; padding: 6px 14px; font-size: 12px; background-color: var(--orange); margin: 0;">View Setup Guide</a></div>
+      </div>
+
+      <div class="fill-action-row">
+        <button id="fillNowBtn" class="primary-btn fill-primary-btn">Fill Form Now</button>
+        <button id="previewFillBtn" class="secondary-btn fill-preview-btn" title="Preview which fields will be filled">Preview</button>
+      </div>
+      <div class="action-group">
+        <button id="generateTextBtn" class="secondary-btn">✦ Generate Text Fields</button>
+        <button id="scanLearnBtn" class="secondary-btn">Scan &amp; Learn New Fields</button>
+        <button id="kbBtn" class="secondary-btn kb-btn">Knowledge Base</button>
+        <button id="historyBtn" class="secondary-btn" style="opacity:0.6;">Fill History</button>
+      </div>
+
+      <!-- Per-site profile binding -->
+      <div id="siteBindingRow" class="hidden" style="margin-top:6px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:10px 12px;">
+        <div style="font-size:11px;color:var(--text-tertiary);margin-bottom:6px;" id="siteBindingDomain">This site</div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <select id="siteBindingSelect"></select>
+          <button id="siteBindingSaveBtn" class="secondary-btn">Bind</button>
+          <button id="siteBindingClearBtn" class="secondary-btn" style="display:none;">Clear</button>
+        </div>
+      </div>
+    </main>
+
+    <!-- Scan Results Review View -->
+    <main id="scanResultsView" class="hidden">
+      <div class="header-with-back">
+         <button id="backFromScanBtn" class="icon-btn">&larr; Back</button>
+         <h2>Discovered Fields</h2>
+      </div>
+      <p style="font-size: 12px; color: var(--text-tertiary); margin: 0 0 14px;">Review the fields AI found. Remove any you don't need, then confirm.</p>
+      <div id="scanResultsList" class="form-group grid-form"></div>
+      <button id="confirmScanBtn" class="primary-btn">Save Learned Fields</button>
+      <button id="discardScanBtn" class="secondary-btn">Discard All</button>
+    </main>
+    
+    <!-- AI Setup Guide View -->
+    <main id="aiSetupView" class="hidden">
+      <div class="header-with-back">
+        <button id="backFromAiSetupBtn" class="icon-btn">&larr; Back</button>
+        <h2>Gemini Nano Setup</h2>
+      </div>
+
+      <!-- Live requirements checker -->
+      <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:14px;margin-bottom:14px;">
+        <div style="font-size:11px;font-weight:600;color:rgba(255,255,255,0.4);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:10px;">Requirements</div>
+        <div class="ai-req-row" id="reqChrome">
+          <span class="ai-req-icon">⏳</span>
+          <div class="ai-req-text">
+            <span class="ai-req-label">Chrome 138 or later</span>
+            <span class="ai-req-value" id="reqChromeVal">Checking…</span>
+          </div>
+        </div>
+        <div class="ai-req-row" id="reqPlatform">
+          <span class="ai-req-icon">⏳</span>
+          <div class="ai-req-text">
+            <span class="ai-req-label">Apple Silicon or compatible GPU</span>
+            <span class="ai-req-value" id="reqPlatformVal">Checking…</span>
+          </div>
+        </div>
+        <div class="ai-req-row">
+          <span class="ai-req-icon">⚠</span>
+          <div class="ai-req-text">
+            <span class="ai-req-label">22 GB free disk space</span>
+            <span class="ai-req-value" style="color:rgba(255,159,10,0.9);">Verify manually — most common cause of failure</span>
+          </div>
+        </div>
+        <div class="ai-req-row" id="reqModel">
+          <span class="ai-req-icon">⏳</span>
+          <div class="ai-req-text">
+            <span class="ai-req-label">Gemini Nano model</span>
+            <span class="ai-req-value" id="reqModelVal">Checking…</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Setup steps -->
+      <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:14px;margin-bottom:14px;">
+        <div style="font-size:11px;font-weight:600;color:rgba(255,255,255,0.4);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:10px;">Setup Steps</div>
+        <div class="ai-step"><span class="ai-step-num">1</span><span>Go to <strong style="color:var(--orange);user-select:all;">chrome://flags/#prompt-api-for-gemini-nano</strong> → set to <strong style="color:var(--green);">Enabled</strong></span></div>
+        <div class="ai-step"><span class="ai-step-num">2</span><span>Go to <strong style="color:var(--orange);user-select:all;">chrome://flags/#optimization-guide-on-device-model</strong> → set to <strong style="color:var(--green);">Enabled BypassPerfRequirement</strong></span></div>
+        <div class="ai-step"><span class="ai-step-num">3</span><span>Click <strong style="color:var(--orange);">Relaunch</strong> at the bottom of the flags page</span></div>
+        <div class="ai-step"><span class="ai-step-num">4</span><span>Wait <strong>15–30 minutes</strong> — Chrome downloads the ~1.7 GB model silently in the background</span></div>
+        <div class="ai-step"><span class="ai-step-num">5</span><span>If model still unavailable, <strong style="color:var(--orange);">free up at least 22 GB disk space</strong> and relaunch Chrome again</span></div>
+      </div>
+
+      <!-- Disk space callout -->
+      <div style="background:rgba(255,159,10,0.08);border:1px solid rgba(255,159,10,0.25);border-radius:10px;padding:11px 13px;margin-bottom:14px;font-size:12px;color:rgba(255,255,255,0.65);line-height:1.5;">
+        <strong style="color:var(--orange);">⚠ Disk space is the #1 reason Gemini Nano won't load.</strong><br>
+        Chrome requires ~22 GB free to download and run the model. Even if flags are correct, the model silently stays unavailable if your disk is full.
+      </div>
+
+      <button id="checkAiStatusBtn" class="primary-btn" style="background-color:var(--orange);margin-bottom:0;">Check AI Status</button>
+    </main>
+    
+    <!-- Knowledge Base View -->
+    <main id="knowledgeBaseView" class="hidden">
+      <div class="header-with-back">
+        <button id="backFromKbBtn" class="icon-btn">&larr; Back</button>
+        <h2>Knowledge Base</h2>
+      </div>
+
+      <p id="kbProfileLabel" style="font-size:12px;color:var(--text-tertiary);margin:-12px 0 14px;"></p>
+
+      <!-- Upload Zone -->
+      <label id="kbUploadZone" class="kb-upload-zone" for="kbFileInput">
+        <div class="kb-upload-icon">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M11 14V4M11 4L7.5 7.5M11 4L14.5 7.5" stroke="rgba(255,255,255,0.4)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M3 16V18C3 19.1 3.9 20 5 20H17C18.1 20 19 19.1 19 18V16" stroke="rgba(255,255,255,0.25)" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <span class="kb-upload-label">Drop files here or tap to upload</span>
+        <span class="kb-upload-types">PDF · DOCX · TXT</span>
+        <input type="file" id="kbFileInput" multiple accept=".pdf,.docx,.txt" style="display:none;">
+      </label>
+
+      <!-- Processing indicator -->
+      <div id="kbProcessing" class="kb-processing hidden">
+        <div class="kb-spinner"></div>
+        <span id="kbProcessingLabel">Processing…</span>
+      </div>
+
+      <!-- Error message -->
+      <p id="kbUploadError" class="pin-error hidden" style="text-align:center;margin:8px 0;"></p>
+
+      <!-- Document list header -->
+      <div class="kb-list-header">
+        <span id="kbDocCount" style="font-size:12px;font-weight:600;color:var(--text-secondary);">Documents</span>
+        <span id="kbStorageUsed" style="font-size:11px;color:var(--text-tertiary);"></span>
+      </div>
+
+      <!-- Document list -->
+      <div id="kbDocList" class="kb-doc-list">
+        <div id="kbEmptyState" class="kb-empty-state">
+          Upload your resume, portfolio, or any document — NeuralFill will use it to answer long-form questions on forms.
+        </div>
+      </div>
+    </main>
+
+    <!-- Fill History View -->
+    <main id="historyView" class="hidden">
+      <div class="header-with-back">
+        <button id="backFromHistoryBtn" class="icon-btn">&larr; Back</button>
+        <h2>Fill History</h2>
+      </div>
+      <div id="historyList" style="display:flex;flex-direction:column;gap:6px;"></div>
+      <div id="historyEmpty" class="kb-empty-state hidden">No fills recorded yet.</div>
+      <button id="clearHistoryBtn" class="secondary-btn" style="margin-top:12px;font-size:12px;">Clear History</button>
+    </main>
+
+    <!-- Edit Profiles View -->
+    <main id="editProfileView" class="hidden">
+      <div class="header-with-back">
+         <button id="backToMainBtn" class="icon-btn">&larr; Back</button>
+         <h2>Manage Profiles</h2>
+      </div>
+      
+      <div class="profile-list" id="profileList">
+        <!-- Profile items injected here -->
+      </div>
+      
+      <div class="add-profile-form">
+         <input type="text" id="newProfileName" placeholder="New Profile Name (e.g. Work)">
+         <button id="addProfileBtn" class="secondary-btn">Add Profile</button>
+      </div>
+      <div style="margin-top:8px;">
+        <label id="importProfileLabel" class="secondary-btn" style="display:block;text-align:center;cursor:pointer;font-size:12px;padding:9px 14px;">
+          Import Profile from JSON
+          <input type="file" id="importProfileInput" accept=".json" style="display:none;">
+        </label>
+      </div>
+      
+      <div id="profileEditor" class="hidden profile-editor-area">
+        <div class="form-group" style="margin-bottom: 16px;">
+          <label for="editProfileName">Profile Name</label>
+          <input type="text" id="editProfileName" class="profile-input" placeholder="e.g. Anish Work">
+        </div>
+        
+        <div class="form-group grid-form">
+          <label>Full Name</label>
+          <input type="text" id="editFullName" class="profile-input">
+          
+          <label>Email</label>
+          <input type="email" id="editEmail" class="profile-input">
+          
+          <label>Phone</label>
+          <input type="tel" id="editPhone" class="profile-input">
+          
+          <label>Date of Birth</label>
+          <input type="text" id="editDob" placeholder="YYYY-MM-DD" class="profile-input">
+        </div>
+
+        <details class="address-section" open>
+          <summary>Address</summary>
+          <div class="form-group grid-form" style="margin-top: 8px;">
+            <label>Street</label>
+            <input type="text" id="editStreet" class="profile-input" placeholder="123 Main Street">
+            
+            <label>City</label>
+            <input type="text" id="editCity" class="profile-input">
+            
+            <label>State / Province</label>
+            <input type="text" id="editState" class="profile-input">
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+              <div>
+                <label>ZIP / Postal</label>
+                <input type="text" id="editZip" class="profile-input">
+              </div>
+              <div>
+                <label>Country</label>
+                <input type="text" id="editCountry" class="profile-input">
+              </div>
+            </div>
+          </div>
+        </details>
+
+        <!-- Professional / Social Fields -->
+        <details class="address-section" style="margin-top:12px;">
+          <summary>Professional &amp; Social</summary>
+          <div class="form-group grid-form" style="margin-top:8px;">
+            <label>Job Title</label>
+            <input type="text" id="editJobTitle" class="profile-input" placeholder="e.g. Software Engineer">
+
+            <label>Company</label>
+            <input type="text" id="editCompany" class="profile-input" placeholder="e.g. Acme Corp">
+
+            <label>LinkedIn URL</label>
+            <input type="url" id="editLinkedIn" class="profile-input" placeholder="https://linkedin.com/in/you">
+
+            <label>GitHub URL</label>
+            <input type="url" id="editGithub" class="profile-input" placeholder="https://github.com/you">
+
+            <label>Twitter / X</label>
+            <input type="text" id="editTwitter" class="profile-input" placeholder="@handle">
+
+            <label>Website / Portfolio</label>
+            <input type="url" id="editWebsite" class="profile-input" placeholder="https://yoursite.com">
+          </div>
+        </details>
+
+        <!-- Miscellaneous / Custom Fields -->
+        <details class="address-section" id="miscSection" style="margin-top:12px;">
+          <summary>Miscellaneous</summary>
+          <div style="padding:0 14px 14px;">
+            <div id="miscFieldsList" class="grid-form" style="margin-bottom:0;"></div>
+            <div style="display:flex;gap:6px;margin-top:10px;align-items:center;">
+              <input type="text" id="miscKeyInput" class="profile-input" placeholder="Field name" style="flex:1;min-width:0;">
+              <input type="text" id="miscValueInput" class="profile-input" placeholder="Value" style="flex:1.5;min-width:0;">
+              <button id="miscAddBtn" class="secondary-btn" style="width:auto;padding:8px 14px;margin:0;flex-shrink:0;font-size:12px;border-radius:980px;">+ Add</button>
+            </div>
+            <p style="font-size:10px;color:rgba(255,255,255,0.28);margin:10px 0 0;text-align:center;line-height:1.4;">Scroll down and hit Save to apply changes</p>
+          </div>
+        </details>
+
+        <button id="saveProfileDataBtn" class="primary-btn">Save Changes</button>
+        <div style="display:flex;gap:8px;margin-top:8px;">
+          <button id="exportProfileBtn" class="secondary-btn" style="flex:1;font-size:12px;">Export JSON</button>
+          <button id="deleteProfileBtn" class="secondary-btn delete" style="flex:1;font-size:12px;">Delete Profile</button>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <span class="status-indicator"></span>
+      <span id="statusText">Initializing…</span>
+      <a id="helpLink" href="https://anishmoncivarghese.com/neuralfill/" target="_blank" title="Help &amp; User Guide" style="color:rgba(255,255,255,0.3);font-size:11px;text-decoration:none;margin-left:auto;margin-right:6px;transition:color 0.15s;" onmouseover="this.style.color='rgba(255,255,255,0.65)'" onmouseout="this.style.color='rgba(255,255,255,0.3)'">Help</a>
+      <button id="lockNowBtn" class="lock-btn hidden" title="Lock NeuralFill">
+        <svg width="13" height="13" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2" y="6.5" width="10" height="7" rx="2" fill="rgba(255,255,255,0.25)" stroke="rgba(255,255,255,0.4)" stroke-width="1.2"/>
+          <path d="M4.5 6.5V4.5C4.5 3 5.4 2 7 2C8.6 2 9.5 3 9.5 4.5V6.5" stroke="rgba(255,255,255,0.4)" stroke-width="1.2" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </footer>
+  </div>
+  <script src="../lib/pdf.min.js"></script>
+  <script src="../lib/mammoth.browser.min.js"></script>
+  <script type="module" src="popup.js"></script>
+</body>
+</html>

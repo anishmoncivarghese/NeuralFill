@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NeuralFill — User Guide</title>
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --bg-card: #13131a;
+      --bg-elevated: #1c1c26;
+      --border: rgba(255,255,255,0.08);
+      --border-strong: rgba(255,255,255,0.14);
+      --text: #f2f2f7;
+      --text-secondary: rgba(255,255,255,0.6);
+      --text-tertiary: rgba(255,255,255,0.35);
+      --blue: #0a84ff;
+      --green: #30d158;
+      --orange: #ff9f0a;
+      --red: #ff453a;
+      --cyan: #5ac8fa;
+      --purple: #bf5af2;
+      --radius: 14px;
+      --radius-sm: 10px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Nav ── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(10,10,15,0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      height: 54px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 17px;
+      letter-spacing: -0.3px;
+    }
+    .nav-brand .dot {
+      width: 8px; height: 8px;
+      background: var(--blue);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--blue);
+    }
+    .nav-links {
+      display: flex;
+      gap: 20px;
+    }
+    .nav-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 13px;
+      transition: color 0.15s;
+    }
+    .nav-links a:hover { color: var(--text); }
+
+    /* ── Layout ── */
+    .page-wrap {
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 60px 24px 100px;
+    }
+
+    /* ── Hero ── */
+    .hero {
+      text-align: center;
+      padding: 60px 0 70px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 64px;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(10,132,255,0.1);
+      border: 1px solid rgba(10,132,255,0.25);
+      border-radius: 980px;
+      padding: 4px 12px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--blue);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+    .hero h1 {
+      font-size: clamp(36px, 6vw, 56px);
+      font-weight: 800;
+      letter-spacing: -1.5px;
+      line-height: 1.1;
+      margin-bottom: 16px;
+      background: linear-gradient(135deg, #fff 0%, rgba(255,255,255,0.65) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero p {
+      font-size: 17px;
+      color: var(--text-secondary);
+      max-width: 520px;
+      margin: 0 auto 28px;
+      line-height: 1.6;
+    }
+    .hero-pills {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-strong);
+      border-radius: 980px;
+      padding: 5px 13px;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+    .pill .dot-sm {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+    }
+
+    /* ── Section ── */
+    section {
+      margin-bottom: 64px;
+      scroll-margin-top: 70px;
+    }
+    .section-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--blue);
+      margin-bottom: 8px;
+    }
+    section > h2 {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin-bottom: 20px;
+    }
+    section > p, section > ul, section > ol {
+      color: var(--text-secondary);
+      font-size: 15px;
+      margin-bottom: 14px;
+    }
+    ul, ol { padding-left: 20px; }
+    li { margin-bottom: 6px; }
+    strong { color: var(--text); font-weight: 600; }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 22px;
+      margin-bottom: 12px;
+    }
+    .card h3 {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card p, .card li {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+    .card ul { margin-top: 8px; }
+
+    /* ── Steps ── */
+    .steps {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    .step {
+      display: flex;
+      gap: 16px;
+      position: relative;
+    }
+    .step:not(:last-child)::before {
+      content: '';
+      position: absolute;
+      left: 15px;
+      top: 32px;
+      bottom: -8px;
+      width: 1px;
+      background: var(--border-strong);
+    }
+    .step-num {
+      width: 32px;
+      height: 32px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-strong);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      flex-shrink: 0;
+      color: var(--blue);
+      margin-top: 2px;
+    }
+    .step-body {
+      padding-bottom: 24px;
+      flex: 1;
+    }
+    .step-body h4 {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .step-body p {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* ── Callout boxes ── */
+    .callout {
+      border-radius: var(--radius-sm);
+      padding: 14px 16px;
+      margin-bottom: 14px;
+      font-size: 14px;
+      line-height: 1.6;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+    .callout-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+    .callout-body { flex: 1; }
+    .callout-body strong { display: block; margin-bottom: 3px; font-size: 13px; }
+    .callout.warn {
+      background: rgba(255,159,10,0.08);
+      border: 1px solid rgba(255,159,10,0.22);
+      color: rgba(255,255,255,0.7);
+    }
+    .callout.info {
+      background: rgba(10,132,255,0.07);
+      border: 1px solid rgba(10,132,255,0.2);
+      color: rgba(255,255,255,0.7);
+    }
+    .callout.success {
+      background: rgba(48,209,88,0.07);
+      border: 1px solid rgba(48,209,88,0.2);
+      color: rgba(255,255,255,0.7);
+    }
+    .callout.danger {
+      background: rgba(255,69,58,0.07);
+      border: 1px solid rgba(255,69,58,0.2);
+      color: rgba(255,255,255,0.7);
+    }
+
+    /* ── Code / kbd ── */
+    code {
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 12.5px;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid var(--border-strong);
+      border-radius: 5px;
+      padding: 2px 6px;
+      color: var(--cyan);
+    }
+    kbd {
+      font-family: inherit;
+      font-size: 12px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-strong);
+      border-bottom-width: 2px;
+      border-radius: 6px;
+      padding: 2px 8px;
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    /* ── Color engine indicators ── */
+    .engine-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+    .engine-badge {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      padding: 7px 12px;
+      font-size: 13px;
+    }
+    .swatch {
+      width: 10px; height: 10px;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+
+    /* ── FAQ ── */
+    .faq-item {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      margin-bottom: 8px;
+      overflow: hidden;
+    }
+    .faq-q {
+      padding: 14px 16px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      background: var(--bg-card);
+      transition: background 0.15s;
+      list-style: none;
+      user-select: none;
+    }
+    .faq-q:hover { background: var(--bg-elevated); }
+    .faq-q::after {
+      content: '▸';
+      font-size: 11px;
+      color: var(--text-tertiary);
+      transition: transform 0.2s;
+      flex-shrink: 0;
+    }
+    details[open] .faq-q::after { transform: rotate(90deg); }
+    .faq-a {
+      padding: 0 16px 16px;
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      background: var(--bg-card);
+      border-top: 1px solid var(--border);
+    }
+    .faq-a p { margin-top: 12px; }
+    .faq-a ul { margin-top: 8px; padding-left: 18px; }
+    .faq-a li { margin-bottom: 5px; }
+
+    /* ── Table ── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      margin-top: 12px;
+    }
+    th {
+      text-align: left;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border-strong);
+    }
+    td {
+      padding: 10px 12px;
+      color: var(--text-secondary);
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+    tr:last-child td { border-bottom: none; }
+    td:first-child { color: var(--text); font-weight: 500; }
+
+    /* ── Privacy chips ── */
+    .privacy-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .privacy-chip {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 14px 16px;
+      display: flex;
+      gap: 10px;
+    }
+    .privacy-chip .icon { font-size: 20px; flex-shrink: 0; }
+    .privacy-chip h4 { font-size: 13px; font-weight: 600; margin-bottom: 3px; }
+    .privacy-chip p { font-size: 12px; color: var(--text-secondary); line-height: 1.5; }
+
+    /* ── Footer ── */
+    footer {
+      text-align: center;
+      padding-top: 40px;
+      border-top: 1px solid var(--border);
+      color: var(--text-tertiary);
+      font-size: 12px;
+      line-height: 1.8;
+    }
+    footer a { color: var(--text-secondary); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+
+    /* ── Divider ── */
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 48px 0;
+    }
+
+    @media (max-width: 600px) {
+      .page-wrap { padding: 40px 16px 80px; }
+      .nav-links { display: none; }
+      .hero { padding: 40px 0 50px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">
+    <div class="dot"></div>
+    NeuralFill
+  </div>
+  <div class="nav-links">
+    <a href="#getting-started">Get Started</a>
+    <a href="#features">Features</a>
+    <a href="#gemini-nano">Gemini Nano</a>
+    <a href="#faq">FAQ</a>
+    <a href="#privacy">Privacy</a>
+  </div>
+</nav>
+
+<div class="page-wrap">
+
+  <!-- ── Hero ── -->
+  <div class="hero">
+    <div class="hero-badge">
+      <span>✦</span> Chrome Extension
+    </div>
+    <h1>Fill any form<br>in one click</h1>
+    <p>NeuralFill auto-fills web forms using your saved profile. No cloud. No tracking. Everything stays on your device, encrypted.</p>
+    <div class="hero-pills">
+      <span class="pill"><span class="dot-sm" style="background:#30d158;"></span> 100% On-Device</span>
+      <span class="pill"><span class="dot-sm" style="background:#0a84ff;"></span> AES-256 Encrypted</span>
+      <span class="pill"><span class="dot-sm" style="background:#5ac8fa;"></span> Gemini Nano AI</span>
+      <span class="pill"><span class="dot-sm" style="background:#ff9f0a;"></span> Zero Network Calls</span>
+    </div>
+  </div>
+
+  <!-- ── Getting Started ── -->
+  <section id="getting-started">
+    <div class="section-label">Getting Started</div>
+    <h2>First-time setup</h2>
+    <p>From installing the extension to filling your first form — takes about 2 minutes.</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h4>Install NeuralFill</h4>
+          <p>Load the extension in Chrome via <strong>chrome://extensions</strong> → enable Developer Mode → click <strong>Load unpacked</strong> → select the NeuralFill folder. Pin the extension to your toolbar for quick access.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h4>Save your encryption key</h4>
+          <p>On first launch, NeuralFill generates a unique <strong>AES-256 encryption key</strong> for your profile data. A dialog will appear — copy and store this key somewhere safe (password manager, secure notes). <strong>Without it you cannot recover your data</strong> if you reinstall Chrome.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h4>Create your profile</h4>
+          <p>Click the NeuralFill icon → tap the <strong>+</strong> button to create a new profile. Give it a name (e.g. "Work", "Personal"), then fill in your details across the sections: basic info, address, professional & social, and any custom fields in Miscellaneous. Hit <strong>Save Changes</strong> when done.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <h4>Fill your first form</h4>
+          <p>Visit any website with a form. A floating badge will appear at the bottom-right of the page. Click <strong>Fill</strong> — watch your fields light up blue as they're filled instantly.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ── Profile ── -->
+  <section id="profile">
+    <div class="section-label">Profile</div>
+    <h2>Managing your profiles</h2>
+    <p>NeuralFill supports multiple profiles so you can switch between contexts — work applications, personal signups, freelance projects.</p>
+
+    <div class="card">
+      <h3>📋 Profile fields</h3>
+      <table>
+        <tr><th>Section</th><th>Fields</th></tr>
+        <tr><td>Basic</td><td>Full Name, Email, Phone, Date of Birth</td></tr>
+        <tr><td>Address</td><td>Street, City, State/Province, ZIP/Postal, Country</td></tr>
+        <tr><td>Professional</td><td>Job Title, Company, LinkedIn, GitHub, Twitter/X, Website</td></tr>
+        <tr><td>Miscellaneous</td><td>Any custom key-value fields you define</td></tr>
+      </table>
+    </div>
+
+    <div class="callout info">
+      <span class="callout-icon">💡</span>
+      <div class="callout-body">
+        <strong>Miscellaneous fields</strong>
+        Add any data you need for specific forms — employee ID, student number, IBAN, nationality, emergency contact, or anything else. Open the profile editor → scroll to <em>Miscellaneous</em> → type the field name and value → click <strong>+ Add</strong> → Save Changes.
+      </div>
+    </div>
+
+    <div class="callout warn">
+      <span class="callout-icon">⚠</span>
+      <div class="callout-body">
+        <strong>Switching profiles mid-fill</strong>
+        Change the active profile in the popup dropdown before clicking Fill. The currently selected profile is always the one used to fill.
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ── Features ── -->
+  <section id="features">
+    <div class="section-label">Features</div>
+    <h2>Everything NeuralFill can do</h2>
+
+    <div class="card" style="margin-bottom:12px;">
+      <h3>⚡ Fill Now</h3>
+      <p>Click <strong>Fill Now</strong> in the popup or press the keyboard shortcut to instantly fill all detected form fields on the current page. Fields are matched using two engines in sequence:</p>
+      <div class="engine-row">
+        <div class="engine-badge"><span class="swatch" style="background:#0a84ff;"></span>Blue glow — Pattern match (instant)</div>
+        <div class="engine-badge"><span class="swatch" style="background:#ff6600;"></span>Orange glow — AI-matched (Gemini Nano)</div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:12px;">
+      <h3>🔷 Floating Badge</h3>
+      <p>When NeuralFill detects a form on the page, a floating badge appears at the bottom-right corner showing how many fields were found. It has two buttons:</p>
+      <ul>
+        <li><strong>Fill</strong> — fills standard fields (name, email, address, etc.)</li>
+        <li><strong>✦ Text</strong> — uses Gemini Nano to generate answers for long-form text fields</li>
+      </ul>
+      <p style="margin-top:8px;">The badge disappears after 12 seconds of no interaction. Any click on the badge resets the timer.</p>
+    </div>
+
+    <div class="card" style="margin-bottom:12px;">
+      <h3>⌨️ Keyboard Shortcut</h3>
+      <p>Trigger fill from anywhere on the page without opening the popup:</p>
+      <p style="margin-top:8px;"><kbd>⌘</kbd> + <kbd>Shift</kbd> + <kbd>F</kbd> on Mac &nbsp;·&nbsp; <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>F</kbd> on Windows/Linux</p>
+    </div>
+
+    <div class="card" style="margin-bottom:12px;">
+      <h3>🔍 Preview Before Fill</h3>
+      <p>Click <strong>Preview</strong> in the popup to see a tooltip above each field showing what value will be inserted — without actually filling anything. Great for checking before committing.</p>
+    </div>
+
+    <div class="card" style="margin-bottom:12px;">
+      <h3>🧠 Scan &amp; Learn</h3>
+      <p>Found a form with unusual fields that NeuralFill doesn't recognise? Use <strong>Scan &amp; Learn</strong> in the popup. Gemini Nano scans the page, identifies unknown fields, and presents them for your review. Confirm the ones you want to save — they'll be stored in your active profile's Miscellaneous section and auto-filled on future visits.</p>
+    </div>
+
+    <div class="card" style="margin-bottom:12px;">
+      <h3>✦ Generate Text (Knowledge Base)</h3>
+      <p>For long-form questions like <em>"Describe your experience"</em> or <em>"Why do you want to work here?"</em> — upload your CV, portfolio, or bio to the <strong>Knowledge Base</strong> in the popup. NeuralFill uses Gemini Nano to generate tailored answers based on your documents. No data ever leaves your device.</p>
+      <p style="margin-top:8px;">Supported formats: PDF, DOCX, TXT. Upload in the Knowledge Base tab → then click <strong>✦ Text</strong> on the badge or use the Generate button on any textarea.</p>
+    </div>
+
+    <div class="card" style="margin-bottom:12px;">
+      <h3>📌 Site Binding</h3>
+      <p>Automatically use a specific profile on a particular site. Open the popup on that site → look for the site binding row at the bottom of the main view → select the profile → click <strong>Bind</strong>. Next time you visit, NeuralFill switches to that profile automatically.</p>
+    </div>
+
+    <div class="card">
+      <h3>🔒 PIN Lock</h3>
+      <p>Protect your profile data with a PIN. In the floating badge, click the lock icon to set a PIN. Once set, NeuralFill sessions last 15 minutes before auto-locking. You can also lock manually by clicking the unlock icon and entering your PIN. Useful when sharing your laptop.</p>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ── Gemini Nano ── -->
+  <section id="gemini-nano">
+    <div class="section-label">AI Engine</div>
+    <h2>Gemini Nano setup</h2>
+    <p>Gemini Nano is Google's on-device AI model built into Chrome. NeuralFill uses it for smart field matching, text generation, and Scan &amp; Learn. It runs entirely on your device — nothing is sent to Google's servers.</p>
+
+    <div class="callout warn">
+      <span class="callout-icon">⚠</span>
+      <div class="callout-body">
+        <strong>Gemini Nano is optional</strong>
+        Standard form filling (name, email, address, phone, etc.) works without Gemini Nano. AI is only required for: <em>Scan &amp; Learn</em>, <em>✦ Generate Text</em>, and AI-assisted matching of unusual fields.
+      </div>
+    </div>
+
+    <h3 style="font-size:18px;margin:28px 0 14px;">System Requirements</h3>
+
+    <div class="card" style="margin-bottom:10px;">
+      <h3>🌐 Chrome Version</h3>
+      <p>Chrome 138 or later is required. Check yours at <code>chrome://settings/help</code>. Update Chrome if needed.</p>
+    </div>
+
+    <div class="card" style="margin-bottom:10px;">
+      <h3>💻 Hardware</h3>
+      <p>Gemini Nano requires a capable GPU or Apple Silicon chip. Confirmed working on:</p>
+      <ul style="margin-top:8px;">
+        <li>Apple Silicon Macs (M1, M2, M3, M4 and later)</li>
+        <li>Modern Windows PCs with a dedicated GPU (NVIDIA / AMD)</li>
+        <li>High-end Intel Macs <em>(some models — not guaranteed)</em></li>
+      </ul>
+      <p style="margin-top:8px;">Older hardware or Intel integrated graphics may show "unavailable".</p>
+    </div>
+
+    <div class="card" style="margin-bottom:10px; border-color: rgba(255,159,10,0.3);">
+      <h3>💾 Disk Space — Most Common Failure Reason</h3>
+      <p>The Gemini Nano model requires approximately <strong>22 GB of free disk space</strong> to download and run. This is the single most common reason the model fails to load — even if all flags are set correctly.</p>
+      <p style="margin-top:8px;">Free up disk space before enabling Gemini Nano. Check available space in <strong>System Settings → General → Storage</strong> (Mac) or <strong>Settings → System → Storage</strong> (Windows).</p>
+    </div>
+
+    <h3 style="font-size:18px;margin:28px 0 14px;">Enable Gemini Nano — Step by Step</h3>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h4>Open Chrome Flags</h4>
+          <p>In a new Chrome tab, go to <code>chrome://flags</code></p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h4>Enable the Prompt API</h4>
+          <p>Search for <code>#prompt-api-for-gemini-nano</code> and set it to <strong>Enabled</strong>.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h4>Enable the On-Device Model</h4>
+          <p>Search for <code>#optimization-guide-on-device-model</code> and set it to <strong>Enabled BypassPerfRequirement</strong>. (Not just "Enabled" — it must be the BypassPerfRequirement option.)</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <h4>Relaunch Chrome</h4>
+          <p>Click the <strong>Relaunch</strong> button that appears at the bottom of the flags page. Do not just close and reopen Chrome — use the Relaunch button to preserve flag state.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <h4>Wait for model download</h4>
+          <p>After relaunch, Chrome will begin downloading the Gemini Nano model in the background. This can take several minutes depending on your internet speed. Check progress at <code>chrome://components</code> — look for <strong>Optimization Guide On Device Model</strong>. Once it shows a version number, the model is ready.</p>
+        </div>
+      </div>
+      <div class="step" style="margin-bottom:0;">
+        <div class="step-num">6</div>
+        <div class="step-body" style="padding-bottom:0;">
+          <h4>Verify in NeuralFill</h4>
+          <p>Open the NeuralFill popup → go to <strong>AI Setup</strong>. The requirements checker will show Chrome version, platform, and model status. All items should show a green checkmark. If not, see the troubleshooting section below.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ── FAQ ── -->
+  <section id="faq">
+    <div class="section-label">FAQ</div>
+    <h2>Frequently asked questions</h2>
+
+    <details class="faq-item">
+      <summary class="faq-q">Gemini Nano shows "unavailable" — what do I do?</summary>
+      <div class="faq-a">
+        <p>Work through this checklist in order:</p>
+        <ul>
+          <li><strong>Chrome version:</strong> Must be 138 or later. Go to <code>chrome://settings/help</code> and update.</li>
+          <li><strong>Both flags enabled:</strong> <code>#prompt-api-for-gemini-nano</code> → Enabled AND <code>#optimization-guide-on-device-model</code> → Enabled BypassPerfRequirement.</li>
+          <li><strong>Used Relaunch button:</strong> After enabling flags, use the Relaunch button at the bottom of the page — not just close/reopen.</li>
+          <li><strong>Disk space:</strong> At least 22 GB free space required. Free up space and try again.</li>
+          <li><strong>Hardware:</strong> Older Intel Macs and PCs without a capable GPU may not be supported. Apple Silicon (M1 and later) works reliably.</li>
+          <li><strong>Check model status:</strong> Visit <code>chrome://components</code> and look for "Optimization Guide On Device Model". If absent, wait longer or try relaunching Chrome again.</li>
+        </ul>
+      </div>
+    </details>
+
+    <details class="faq-item">
+      <summary class="faq-q">The model was working, but stopped after I quit Chrome</summary>
+      <div class="faq-a">
+        <p>Fully quitting Chrome (<kbd>⌘</kbd>+<kbd>Q</kbd> on Mac, closing all windows on Windows) can reset experimental flag states. Always use the <strong>Relaunch</strong> button in <code>chrome://flags</code> instead of quitting and reopening. If you need to restart Chrome, re-enable the flags and relaunch again.</p>
+      </div>
+    </details>
+
+    <details class="faq-item">
+      <summary class="faq-q">Text generation fails or gives an error</summary>
+      <div class="faq-a">
+        <p>This can happen when Chrome's AI engine is under memory pressure on the first inference call. NeuralFill automatically retries once. If it still fails:</p>
+        <ul>
+          <li>Close other browser tabs to free memory</li>
+          <li>Close other applications running in the background</li>
+          <li>Try the generation again — the second attempt almost always succeeds</li>
+          <li>If generating multiple text fields, be patient — each field can take 5–15 seconds</li>
+        </ul>
+      </div>
+    </details>
+
+    <details class="faq-item">
+      <summary class="faq-q">I can't see "Optimization Guide On Device Model" in chrome://components</summary>
+      <div class="faq-a">
+        <p>This component only appears after both Chrome flags are enabled and Chrome has been relaunched. Steps to force it:</p>
+        <ul>
+          <li>Enable both flags as described above</li>
+          <li>Click Relaunch (not close/reopen)</li>
+          <li>Wait 5–10 minutes after relaunch</li>
+          <li>Go to <code>chrome://components</code> and click <strong>Check for update</strong> on any component to trigger a refresh</li>
+          <li>If it still doesn't appear after 30 minutes, ensure you have enough disk space and a stable internet connection</li>
+        </ul>
+      </div>
+    </details>
+
+    <details class="faq-item">
+      <summary class="faq-q">A field is being filled with the wrong value</summary>
+      <div class="faq-a">
+        <p>NeuralFill uses field labels, IDs, and names to identify what each field is. Occasionally a field on a site uses an unusual name. To fix it:</p>
+        <ul>
+          <li>Use <strong>Scan &amp; Learn</strong> — Gemini Nano will identify the field and save the correct mapping to your profile</li>
+          <li>Right-click the field → use the context menu to manually map it to the right profile value</li>
+          <li>Add the correct value in your profile's <strong>Miscellaneous</strong> section with a field name matching the site's label</li>
+        </ul>
+        <p>NeuralFill will <strong>never</strong> fill password, CVV, card number, or expiry date fields regardless of how they're labelled.</p>
+      </div>
+    </details>
+
+    <details class="faq-item">
+      <summary class="faq-q">How do I add fields that aren't in the standard profile?</summary>
+      <div class="faq-a">
+        <p>Open the profile editor → scroll to the <strong>Miscellaneous</strong> section at the bottom → type the field name (e.g. "Employee ID") and its value → click <strong>+ Add</strong>. You can add as many fields as you need. Hit <strong>Save Changes</strong> at the bottom when done.</p>
+        <p>Alternatively, use <strong>Scan &amp; Learn</strong> on a site that has those fields — NeuralFill will detect them automatically.</p>
+      </div>
+    </details>
+
+    <details class="faq-item">
+      <summary class="faq-q">How do I back up or transfer my profile to another computer?</summary>
+      <div class="faq-a">
+        <p>Open the profile editor for any profile → click <strong>Export JSON</strong>. Save the file. On the new machine, open NeuralFill → click <strong>Import Profile from JSON</strong> and select the file.</p>
+        <p>Your <strong>encryption key</strong> is device-specific. You will need to re-enter your profile data if moving to a new installation, or keep the exported JSON as a backup alongside your key.</p>
+      </div>
+    </details>
+
+    <details class="faq-item">
+      <summary class="faq-q">Can NeuralFill see or fill my passwords?</summary>
+      <div class="faq-a">
+        <p>No. NeuralFill explicitly skips all password fields. It detects them by field type (<code>type="password"</code>) and by name patterns (password, pass, pwd, secret). This exclusion cannot be overridden.</p>
+        <p>Similarly, payment fields — CVV, card numbers, and expiry dates — are also permanently excluded.</p>
+      </div>
+    </details>
+
+    <details class="faq-item">
+      <summary class="faq-q">What does the floating badge do when it shows a lock icon?</summary>
+      <div class="faq-a">
+        <p>The lock icon reflects your PIN security state:</p>
+        <ul>
+          <li><strong>🔓 Open padlock (green)</strong> — unlocked and ready to fill</li>
+          <li><strong>🔒 Closed padlock (dim)</strong> — locked; click it to enter your PIN and unlock</li>
+          <li><strong>No PIN configured</strong> — shows open padlock; click it to set a PIN for security</li>
+        </ul>
+        <p>Once unlocked, your session stays unlocked for 15 minutes of activity. You can lock early by clicking the open padlock icon and confirming your PIN.</p>
+      </div>
+    </details>
+
+    <details class="faq-item">
+      <summary class="faq-q">The floating badge disappeared before generation finished</summary>
+      <div class="faq-a">
+        <p>This was a known issue that has been fixed. The badge now stays visible for the entire duration of text generation and only disappears ~6 seconds after all fields have been generated. If you're still seeing early dismissal, reload the extension at <code>chrome://extensions</code>.</p>
+      </div>
+    </details>
+
+    <details class="faq-item">
+      <summary class="faq-q">Does NeuralFill send any data to the internet?</summary>
+      <div class="faq-a">
+        <p>No. NeuralFill's Content Security Policy explicitly blocks all network connections (<code>connect-src 'none'</code>). Your profile data, documents, and AI interactions are 100% local. Gemini Nano runs on your device — not on Google's servers.</p>
+      </div>
+    </details>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ── Privacy ── -->
+  <section id="privacy">
+    <div class="section-label">Privacy &amp; Security</div>
+    <h2>Your data, your device</h2>
+    <p>NeuralFill was built with privacy as a hard constraint, not an afterthought.</p>
+
+    <div class="privacy-grid">
+      <div class="privacy-chip">
+        <span class="icon">🔐</span>
+        <div>
+          <h4>AES-256 Encryption</h4>
+          <p>All profile data is encrypted with AES-GCM 256-bit before being written to storage.</p>
+        </div>
+      </div>
+      <div class="privacy-chip">
+        <span class="icon">📵</span>
+        <div>
+          <h4>Zero Network Calls</h4>
+          <p>The extension's CSP blocks all outbound connections. Nothing can be sent externally.</p>
+        </div>
+      </div>
+      <div class="privacy-chip">
+        <span class="icon">🧠</span>
+        <div>
+          <h4>On-Device AI</h4>
+          <p>Gemini Nano runs locally in Chrome. Your documents and prompts never reach a server.</p>
+        </div>
+      </div>
+      <div class="privacy-chip">
+        <span class="icon">🚫</span>
+        <div>
+          <h4>No Passwords / CVV</h4>
+          <p>Password and payment security fields are permanently excluded from filling.</p>
+        </div>
+      </div>
+      <div class="privacy-chip">
+        <span class="icon">🔑</span>
+        <div>
+          <h4>Your Key, Your Data</h4>
+          <p>The encryption key is generated on your device. NeuralFill never sees it.</p>
+        </div>
+      </div>
+      <div class="privacy-chip">
+        <span class="icon">🔒</span>
+        <div>
+          <h4>PIN Protection</h4>
+          <p>Optional PIN lock prevents access if someone else uses your browser or laptop.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>NeuralFill &nbsp;·&nbsp; Privacy-first form filling &nbsp;·&nbsp; All data stays on your device</p>
+    <p style="margin-top:6px;"><a href="https://github.com/anishmoncivarghese/NeuralFill/issues" target="_blank">Report an issue</a> &nbsp;·&nbsp; <a href="https://github.com/anishmoncivarghese/NeuralFill" target="_blank">GitHub</a></p>
+  </footer>
+
+</div>
+</body>
+</html>
